@@ -1,0 +1,92 @@
+#!newt
+
+local false := nil;
+
+//local maybe := func (value) if value == NIL then {Nothing: };
+
+Tuple := {
+    new: func(x1, x2) {_parent:self, data:[x1, x2]},
+    fst: func() data[0],
+    snd: func() data[1],
+    fstUpdate: func(x1) data[0] := x1,
+    sndUpdate: func(x2) data[1] := x2,
+};
+
+func concatWith(list, c)
+begin
+    local str := "";
+    local n := length(list);
+    for i := 0 to (n-2) by 1 do
+        begin;
+        str := str & list[i] & c; 
+        end;
+    return str & list[n-1];
+end;
+
+func concat(list) concatWith(list, " ");
+
+func showType(value_)
+begin
+    //print(if value_.last then "true" else "false");
+    if value_.last then
+        return value_.type;
+    if value_.type == "Tuple" then
+        return "(" & showType(value_.value.(0)) & ", " & showType(value_.value.(1)) & ")";
+    if value_.type == "Array" then
+        return "ARRAY NOT DEFINED";
+    if IsArray(value_.value) and length(value_.value) >= 2 then
+    begin
+	//print(value_.value.type);
+        list := foreach element in value_.value collect showType(element);
+        return value_.type & " (" & concatWith(list, ") (") & ")";
+    end;
+    if value_.last == false then
+    begin
+        if value_.value.last then
+	    return value_.type & " " & showType(value_.value);
+        else
+	    return value_.type & " (" & showType(value_.value) & ")";
+    end;
+end; 
+
+func name(name_) {value: name_, type: "Name", last:true};
+func int(int_) {value: int_, type: "Int", last:true};
+func bool(bool_) {value: bool_, type: "Bool", last:true};
+func tuple(x1, x2) {value: [x1, x2], type: "Tuple", last:false};
+
+func expression(exp_) {value: exp_, type: "Expr", last:false};
+func evar(evar_) {value: evar_, type: "EVar", last:false};
+func enum(enum_) {value: enum_, type: "ENum", last:false};
+func econstr(econstr0_, econstr1_) {value: [econstr0_, econstr1_], type: "EConstr", last:false};
+func eap(exp0, exp1) {value: [exp0, exp1], type: "EAp", last:false};
+func elet(isRec, defs, body) {value: [isRec, defs, body], type: "ELet", last:false};
+
+func Expr(a) {
+    EVar: func(name_) evar(name(name_)), 
+    ENum: func(int_) enum(int(int_)), 
+    EConstr: func(int0_, int1_) econstr(int(int0_), int(int1_)), 
+    EAp: func(exp0, exp1) eap(expression(exp0), expression(exp1)),
+    ELet: func(isRec, defs, body) elet(bool(isRec), defs, expression(body)),
+};
+
+
+//local evar1 := Expr:EVar("name1");
+//local enum1 := Expr:ENum("name2");
+//local econstr1 := Expr:EConstr("1", "2");
+
+
+//local tuple := Tuple:new(1, 2);
+//print(tuple:fst());
+//tuple:fstUpdate(10);
+//print(tuple:fst());
+//print(concat(["1", "2", "3"]));
+//print(showType(enum1));
+//print(showType(econstr1));
+//print("\n");
+//print(kek(1, 2));
+local keks1 := Expr("kek"):EVar("lols1");
+local keks2 := Expr("kek"):ENum(1);
+local lols := Expr("lol"):EAp(keks1, keks2);
+
+print(showType(lols));
+
