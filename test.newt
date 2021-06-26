@@ -88,5 +88,7 @@ local keks1 := Expr("kek"):EVar("lols1");
 local keks2 := Expr("kek"):ENum(1);
 local lols := Expr("lol"):EAp(keks1, keks2);
 
-print(showType(lols));
+local wow := Expr("wow"):ELet(bool("true"), keks1, keks2);
+
+print(showType(wow));
 
